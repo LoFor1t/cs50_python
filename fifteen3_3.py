@@ -1,29 +1,41 @@
+import time
+import numpy as np
+
 maximum = 0
 array_field = []
 change = 0
+search_list = {}
+intermediate_array = []
 
 
 def init():
     global maximum
     global array_field
+    global intermediate_array
 
     unknown_x = 0
     unknown_y = 0
-    step = 1
+    step = 0
 
-    search_list = dict()
-    search_list['0'] = [[1, 2, 3],
-                        [4, 8, '_'],
-                        [6, 5, 7]]
+    global search_list
+    search_list[0] = np.array([[1, 2, 3],
+                               [4, 8, '_'],
+                               [6, 5, 7]])
 
     parents = dict()
     flag_change = True
     list_of_numbers_for_paste = []
     maximum = 3
-    draw()
+    last_step = 10
+    # draw()
     while True:
-        intermediate_array = search_list[step]
+        try:
+            intermediate_array = search_list[step]
+        except KeyError:
+            step += 1
+            continue
         step += 1
+        draw()
         if won():
             break
         for y in range(maximum):
@@ -35,106 +47,146 @@ def init():
         # First line
         if unknown_y == 0 and unknown_x == 0:
             # Down
-            saving_array = intermediate_array
+            saving_array = intermediate_array.copy()
             saving_array[1][0], saving_array[0][0] = saving_array[0][0], saving_array[1][0]
-            search_list[step * 4 + 3] = saving_array
+            search_list[last_step + 1] = np.array(saving_array.copy())
 
             # Right
-            saving_array = intermediate_array
+            saving_array = intermediate_array.copy()
             saving_array[0][1], saving_array[0][0] = saving_array[0][0], saving_array[0][1]
-            search_list[step * 4 + 4] = saving_array
+            search_list[last_step + 2] = np.array(saving_array.copy())
+            last_step += 2
 
         elif unknown_y == 0 and unknown_x == 1:
             # Left
-            saving_array = intermediate_array
+            saving_array = intermediate_array.copy()
             saving_array[0][0], saving_array[0][1] = saving_array[0][1], saving_array[0][0]
-            search_list[step * 4 + 2] = saving_array
+            search_list[last_step + 1] = np.array(saving_array.copy())
 
             # Down
-            saving_array = intermediate_array
+            saving_array = intermediate_array.copy()
             saving_array[1][1], saving_array[0][1] = saving_array[0][1], saving_array[1][1]
-            search_list[step * 4 + 3] = saving_array
+            search_list[last_step + 2] = np.array(saving_array.copy())
 
             # Right
-            saving_array = intermediate_array
+            saving_array = intermediate_array.copy()
             saving_array[0][2], saving_array[0][1] = saving_array[0][1], saving_array[0][2]
-            search_list[step * 4 + 4] = saving_array
+            search_list[last_step + 3] = np.array(saving_array.copy())
+            last_step += 3
 
         elif unknown_y == 0 and unknown_x == 2:
             # Left
-            saving_array = intermediate_array
+            saving_array = intermediate_array.copy()
             saving_array[0][1], saving_array[0][2] = saving_array[0][2], saving_array[0][1]
-            search_list[step * 4 + 2] = saving_array
+            search_list[last_step + 1] = np.array(saving_array.copy())
 
             # Down
-            saving_array = intermediate_array
+            saving_array = intermediate_array.copy()
             saving_array[2][0], saving_array[0][2] = saving_array[0][2], saving_array[2][0]
-            search_list[step * 4 + 2] = saving_array
+            search_list[last_step + 2] = np.array(saving_array.copy())
+            last_step += 2
 
         # Second line
         elif unknown_y == 1 and unknown_x == 0:
             # Up
-            saving_array = intermediate_array
+            saving_array = intermediate_array.copy()
             saving_array[0][0], saving_array[1][0] = saving_array[1][0], saving_array[0][0]
-            search_list[step * 4 + 1] = saving_array
+            search_list[last_step + 1] = np.array(saving_array.copy())
 
             # Down
-            saving_array = intermediate_array
+            saving_array = intermediate_array.copy()
             saving_array[2][0], saving_array[1][0] = saving_array[1][0], saving_array[2][0]
-            search_list[step * 4 + 3] = saving_array
+            search_list[last_step + 2] = np.array(saving_array.copy())
 
             # Right
-            saving_array = intermediate_array
+            saving_array = intermediate_array.copy()
             saving_array[1][1], saving_array[1][0] = saving_array[1][0], saving_array[1][1]
-            search_list[step * 4 + 4] = saving_array
+            search_list[last_step + 3] = np.array(saving_array.copy())
+            last_step += 3
 
         elif unknown_y == 1 and unknown_x == 1:
             # Up
-            saving_array = intermediate_array
+            saving_array = intermediate_array.copy()
             saving_array[0][1], saving_array[1][1] = saving_array[1][1], saving_array[0][1]
-            search_list[step * 4 + 1] = saving_array
+            search_list[last_step + 1] = np.array(saving_array.copy())
 
             # Left
-            saving_array = intermediate_array
+            saving_array = intermediate_array.copy()
             saving_array[1][0], saving_array[1][1] = saving_array[1][1], saving_array[1][0]
-            search_list[step * 4 + 2] = saving_array
+            search_list[last_step + 2] = np.array(saving_array.copy())
 
             # Down
-            saving_array = intermediate_array
+            saving_array = intermediate_array.copy()
             saving_array[2][1], saving_array[1][1] = saving_array[1][1], saving_array[2][1]
-            search_list[step * 4 + 3] = saving_array
+            search_list[last_step + 3] = np.array(saving_array.copy())
 
             # Right
-            saving_array = intermediate_array
+            saving_array = intermediate_array.copy()
             saving_array[1][2], saving_array[1][1] = saving_array[1][1], saving_array[1][2]
-            search_list[step * 4 + 4] = saving_array
+            search_list[last_step + 4] = np.array(saving_array.copy())
+            last_step += 4
 
         elif unknown_y == 1 and unknown_x == 2:
             # Up
-            saving_array = intermediate_array
+            saving_array = intermediate_array.copy()
             saving_array[0][2], saving_array[1][2] = saving_array[1][2], saving_array[0][2]
-            search_list[step * 4 + 1] = saving_array
+            search_list[last_step + 1] = np.array(saving_array.copy())
 
             # Left
-            saving_array = intermediate_array
+            saving_array = intermediate_array.copy()
             saving_array[1][1], saving_array[1][2] = saving_array[1][2], saving_array[1][1]
-            search_list[step * 4 + 2] = saving_array
+            search_list[last_step + 2] = np.array(saving_array.copy())
 
             # Down
-            saving_array = intermediate_array
+            saving_array = intermediate_array.copy()
             saving_array[2][2], saving_array[1][2] = saving_array[1][2], saving_array[2][2]
-            search_list[step * 4 + 3] = saving_array
+            search_list[last_step + 3] = np.array(saving_array.copy())
+            last_step += 3
 
         # Third line
         elif unknown_y == 2 and unknown_x == 0:
             # Up
-            saving_array = intermediate_array
+            saving_array = intermediate_array.copy()
             saving_array[1][0], saving_array[2][0] = saving_array[2][0], saving_array[1][0]
-            search_list[step * 4 + 1] = saving_array
+            search_list[last_step + 1] = np.array(saving_array.copy())
 
             # Right
-            saving_array = intermediate_array
-            saving_array[2][1], saving_array[2][0] = saving_array[2][0], saving_array[1][0]
+            saving_array = intermediate_array.copy()
+            saving_array[2][1], saving_array[2][0] = saving_array[2][0], saving_array[2][1]
+            search_list[last_step + 2] = np.array(saving_array.copy())
+            last_step += 2
+
+        elif unknown_y == 2 and unknown_x == 1:
+            # Up
+            saving_array = intermediate_array.copy()
+            saving_array[1][1], saving_array[2][1] = saving_array[2][1], saving_array[1][1]
+            search_list[last_step + 1] = np.array(saving_array.copy())
+
+            # Left
+            saving_array = intermediate_array.copy()
+            saving_array[2][0], saving_array[2][1] = saving_array[2][1], saving_array[2][0]
+            search_list[last_step + 2] = np.array(saving_array.copy())
+
+            # Right
+            saving_array = intermediate_array.copy()
+            saving_array[2][2], saving_array[2][1] = saving_array[2][1], saving_array[2][2]
+            search_list[last_step + 3] = np.array(saving_array.copy())
+            last_step += 3
+
+        elif unknown_y == 2 and unknown_x == 2:
+            # Up
+            saving_array = intermediate_array.copy()
+            saving_array[1][2], saving_array[2][2] = saving_array[2][2], saving_array[1][2]
+            search_list[last_step + 1] = np.array(saving_array.copy())
+
+            # Left
+            saving_array = intermediate_array.copy()
+            saving_array[2][1], saving_array[2][2] = saving_array[2][2], saving_array[2][1]
+            search_list[last_step + 2] = np.array(saving_array.copy())
+            last_step += 2
+        print(step)
+
+
 
 
 
@@ -142,7 +194,7 @@ def init():
 def draw():
     for y in range(maximum):
         for x in range(maximum):
-            print(str(array_field[y][x]), end=' ')
+            print(str(intermediate_array[y][x]), end=' ')
         print()
 
 
@@ -194,20 +246,24 @@ def won():
     # Замена пустой ячейки на ячейку которая должна быть на её месте
     for y in range(maximum):
         for x in range(maximum):
-            if array_field[y][x] == '_':
-                array_field[y][x] = 9
+            if intermediate_array[y][x] == '_':
+                intermediate_array[y][x] = 9
                 y_space = y
                 x_space = x
     # Сравнение предыдущего и нынешнего значения
     for y in range(maximum):
         for x in range(maximum):
             # Если предыдущее больше чем нынешнее - ты не выиграл
-            if y > 0 and x == 0 and array_field[y - 1][maximum - 1] > array_field[y][x]:
+            if y > 0 and x == 0 and intermediate_array[y - 1][maximum - 1] > intermediate_array[y][x]:
                 flag_won = False
-            elif array_field[y][x - 1] > array_field[y][x] and x > 0:
+            elif intermediate_array[y][x - 1] > intermediate_array[y][x] and x > 0:
                 flag_won = False
-    array_field[y_space][x_space] = '_'
+    intermediate_array[y_space][x_space] = '_'
     if flag_won:
         return True
     else:
         return False
+
+
+if __name__ == '__main__':
+    init()
